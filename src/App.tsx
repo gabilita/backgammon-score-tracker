@@ -26,10 +26,11 @@ import {
   TableBody,
   Cell,
 } from '@adobe/react-spectrum'
+import { STORAGE_KEYS, UI_TEXT } from './constants'
 
 function App() {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
-    () => (localStorage.getItem('bst:scheme') as 'light' | 'dark') || 'light',
+    () => (localStorage.getItem(STORAGE_KEYS.scheme) as 'light' | 'dark') || 'light',
   )
   const [userName, setUserName] = useState('')
   const [users, setUsers] = useState<string[]>([])
@@ -54,8 +55,8 @@ function App() {
 
   useEffect(() => {
     try {
-      const savedUsers = JSON.parse(localStorage.getItem('bst:users') || '[]') as string[]
-      const savedGames = JSON.parse(localStorage.getItem('bst:games') || '[]') as {
+      const savedUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]') as string[]
+      const savedGames = JSON.parse(localStorage.getItem(STORAGE_KEYS.games) || '[]') as {
         id: string
         a: string
         b: string
@@ -68,31 +69,31 @@ function App() {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('bst:users', JSON.stringify(users))
-    localStorage.setItem('bst:games', JSON.stringify(games))
+    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users))
+    localStorage.setItem(STORAGE_KEYS.games, JSON.stringify(games))
   }, [users, games])
 
   useEffect(() => {
-    localStorage.setItem('bst:scheme', colorScheme)
+    localStorage.setItem(STORAGE_KEYS.scheme, colorScheme)
   }, [colorScheme])
 
   return (
     <Provider theme={defaultTheme} colorScheme={colorScheme}>
       <Flex direction="column" gap="size-300" margin="size-400">
         <Flex direction="row" justifyContent="space-between" alignItems="center">
-          <Heading level={1}>Backgammon Score Tracker</Heading>
+          <Heading level={1}>{UI_TEXT.appTitle}</Heading>
           <Button
             variant="secondary"
             onPress={() => setColorScheme((s) => (s === 'light' ? 'dark' : 'light'))}
           >
-            Switch to {colorScheme === 'light' ? 'Dark' : 'Light'}
+            {colorScheme === 'light' ? UI_TEXT.toggleToDark : UI_TEXT.toggleToLight}
           </Button>
         </Flex>
 
         <View>
-          <Heading level={3}>Add User</Heading>
+          <Heading level={3}>{UI_TEXT.addUser}</Heading>
           <Flex gap="size-200" alignItems="end">
-            <TextField label="Name" value={userName} onChange={setUserName} width="size-3600" />
+            <TextField label={UI_TEXT.nameLabel} value={userName} onChange={setUserName} width="size-3600" />
             <Button
               variant="cta"
               isDisabled={!userName.trim()}
@@ -104,7 +105,7 @@ function App() {
                 setUserName('')
               }}
             >
-              Add
+              {UI_TEXT.add}
             </Button>
           </Flex>
         </View>
@@ -112,9 +113,9 @@ function App() {
         <Divider size="S" />
 
         <View>
-          <Heading level={3}>Users</Heading>
+          <Heading level={3}>{UI_TEXT.users}</Heading>
           {users.length === 0 ? (
-            <Text>No users yet.</Text>
+            <Text>{UI_TEXT.noUsers}</Text>
           ) : (
             <ListView aria-label="Users list" selectionMode="none">
               {users.map((u) => (
@@ -127,10 +128,10 @@ function App() {
         <Divider size="S" />
 
         <View>
-          <Heading level={3}>Add Game / Lines</Heading>
+          <Heading level={3}>{UI_TEXT.addGame}</Heading>
           <Flex gap="size-200" wrap>
             <Picker
-              aria-label="Player A"
+              aria-label={UI_TEXT.playerA}
               selectedKey={playerA || undefined}
               onSelectionChange={(key: Key | null) => setPlayerA(key ? String(key) : null)}
               isDisabled={users.length < 2}
@@ -141,7 +142,7 @@ function App() {
               ))}
             </Picker>
             <Picker
-              aria-label="Player B"
+              aria-label={UI_TEXT.playerB}
               selectedKey={playerB || undefined}
               onSelectionChange={(key: Key | null) => setPlayerB(key ? String(key) : null)}
               isDisabled={users.length < 2}
@@ -152,7 +153,7 @@ function App() {
               ))}
             </Picker>
             <NumberField
-              label="Lines"
+              label={UI_TEXT.lines}
               minValue={1}
               value={lines}
               onChange={setLines}
@@ -165,12 +166,12 @@ function App() {
                 variant="cta"
                 isDisabled={!playerA || !playerB || playerA === playerB || lines < 1}
               >
-                Record Winner
+                {UI_TEXT.recordWinner}
               </Button>
               <Dialog>
-                <Heading>Confirm Winner</Heading>
+                <Heading>{UI_TEXT.confirmWinner}</Heading>
                 <Content>
-                  <Text>Select the winner for this game.</Text>
+                  <Text>{UI_TEXT.selectWinner}</Text>
                   <Flex gap="size-200" marginTop="size-200">
                     <ActionButton
                       onPress={() => {
@@ -181,7 +182,7 @@ function App() {
                         ])
                       }}
                     >
-                      {playerA || 'Player A'}
+                      {playerA || UI_TEXT.playerA}
                     </ActionButton>
                     <ActionButton
                       onPress={() => {
@@ -192,24 +193,24 @@ function App() {
                         ])
                       }}
                     >
-                      {playerB || 'Player B'}
+                      {playerB || UI_TEXT.playerB}
                     </ActionButton>
                   </Flex>
                 </Content>
                 <ButtonGroup>
-                  <Button variant="secondary">Close</Button>
+                  <Button variant="secondary">{UI_TEXT.close}</Button>
                 </ButtonGroup>
               </Dialog>
             </DialogTrigger>
           </Flex>
 
           <View marginTop="size-300">
-            <TableView aria-label="Games" density="spacious">
+            <TableView aria-label={UI_TEXT.games} density="spacious">
               <TableHeader>
-                <Column>Player A</Column>
-                <Column>Player B</Column>
-                <Column>Lines</Column>
-                <Column>Winner</Column>
+                <Column>{UI_TEXT.playerA}</Column>
+                <Column>{UI_TEXT.playerB}</Column>
+                <Column>{UI_TEXT.lines}</Column>
+                <Column>{UI_TEXT.recordWinner}</Column>
               </TableHeader>
               <TableBody>
                 {games.map((g) => (
@@ -228,12 +229,12 @@ function App() {
         <Divider size="S" />
 
         <View>
-          <Heading level={3}>Ranking</Heading>
-          <TableView aria-label="Ranking" density="spacious">
+          <Heading level={3}>{UI_TEXT.ranking}</Heading>
+          <TableView aria-label={UI_TEXT.ranking} density="spacious">
             <TableHeader>
-              <Column>Rank</Column>
-              <Column>Player</Column>
-              <Column>Total Lines</Column>
+              <Column>{UI_TEXT.rank}</Column>
+              <Column>{UI_TEXT.player}</Column>
+              <Column>{UI_TEXT.totalLines}</Column>
             </TableHeader>
             <TableBody>
               {ranking.map(([player, total], idx) => (
