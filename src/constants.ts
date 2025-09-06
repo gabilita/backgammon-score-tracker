@@ -5,6 +5,7 @@ export const STORAGE_KEYS = {
   players: 'bst:players',
   matches: 'bst:matches',
   rankingTotals: 'bst:ranking',
+  sessions: 'bst:sessions',
 } as const
 
 export const UI_TEXT = {
@@ -31,6 +32,15 @@ export const UI_TEXT = {
   toggleToDark: 'Switch to Dark',
   toggleToLight: 'Switch to Light',
   darkMode: 'Dark mode',
+  sessions: 'Sessions',
+  createSession: 'Create Session',
+  sessionDate: 'Session Date',
+  selectPlayers: 'Select Players',
+  create: 'Create',
+  sessionsList: 'Sessions',
+  addMatch: 'Add Match',
+  addGameWin: 'Add Game Win',
+  bestOfThree: 'Best of 3',
 } as const
 
 export type ColorScheme = 'light' | 'dark'

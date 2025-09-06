@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type Key } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import {
   Provider,
@@ -12,13 +12,6 @@ import {
   ListView,
   Item,
   Divider,
-  DialogTrigger,
-  Dialog,
-  Content,
-  ButtonGroup,
-  ActionButton,
-  Picker,
-  NumberField,
   ActionGroup,
   ToggleButton,
   TableView,
@@ -29,7 +22,7 @@ import {
   Cell,
 } from '@adobe/react-spectrum'
 import { STORAGE_KEYS, UI_TEXT } from './constants'
-import type { UserName, Game } from './types'
+import type { UserName, Game, Session, Match, GameResult } from './types'
 
 function App() {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
@@ -47,10 +40,7 @@ function App() {
       return []
     }
   })
-  const [playerA, setPlayerA] = useState<UserName | null>(null)
-  const [playerB, setPlayerB] = useState<UserName | null>(null)
-  const [lines, setLines] = useState<number>(1)
-  const [games, setGames] = useState<Game[]>(() => {
+  const [games] = useState<Game[]>(() => {
     try {
       return JSON.parse(
         localStorage.getItem(STORAGE_KEYS.matches) ||
@@ -61,7 +51,14 @@ function App() {
       return []
     }
   })
-  const [activeView, setActiveView] = useState<'home' | 'players' | 'matches' | 'rankings'>('home')
+  const [activeView, setActiveView] = useState<'home' | 'players' | 'sessions' | 'rankings'>('home')
+  const [sessions, setSessions] = useState<Session[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.sessions) || '[]') as Session[]
+    } catch {
+      return []
+    }
+  })
   const ranking = useMemo(() => {
     const totals = new Map<string, number>()
     for (const u of users) totals.set(u, 0)
@@ -74,14 +71,11 @@ function App() {
   // initial state is loaded synchronously from localStorage in useState initializers above
 
   useEffect(() => {
-    // Save under new keys (players/matches) and legacy keys (users/games)
+    // Save under new keys (players) and legacy (users)
     const usersJson = JSON.stringify(users)
-    const gamesJson = JSON.stringify(games)
     localStorage.setItem(STORAGE_KEYS.players, usersJson)
     localStorage.setItem(STORAGE_KEYS.users, usersJson)
-    localStorage.setItem(STORAGE_KEYS.matches, gamesJson)
-    localStorage.setItem(STORAGE_KEYS.games, gamesJson)
-  }, [users, games])
+  }, [users])
 
   // Persist computed rankings snapshot for convenience
   useEffect(() => {
@@ -107,11 +101,11 @@ function App() {
               <ActionGroup
                 selectionMode="single"
                 selectedKeys={[activeView === 'home' ? 'players' : activeView]}
-                onSelectionChange={(keys) => setActiveView(Array.from(keys)[0] as 'players' | 'matches' | 'rankings')}
+                onSelectionChange={(keys) => setActiveView(Array.from(keys)[0] as 'players' | 'sessions' | 'rankings')}
                 isQuiet
               >
                 <Item key="players">Players</Item>
-                <Item key="matches">Matches</Item>
+                <Item key="sessions">{UI_TEXT.sessions}</Item>
                 <Item key="rankings">Rankings</Item>
               </ActionGroup>
               <ToggleButton
@@ -132,11 +126,11 @@ function App() {
                 <View marginTop="size-300">
                   <ActionGroup
                     selectionMode="single"
-                    onAction={(key) => setActiveView(key as 'players' | 'matches' | 'rankings')}
+                    onAction={(key) => setActiveView(key as 'players' | 'sessions' | 'rankings')}
                     isEmphasized
                   >
                     <Item key="players">{UI_TEXT.users}</Item>
-                    <Item key="matches">{UI_TEXT.games}</Item>
+                    <Item key="sessions">{UI_TEXT.sessions}</Item>
                     <Item key="rankings">{UI_TEXT.ranking}</Item>
                   </ActionGroup>
                 </View>
@@ -182,105 +176,34 @@ function App() {
               </>
             )}
 
-            {activeView === 'matches' && (
+            {activeView === 'sessions' && (
               <>
                 <View>
-                  <Heading level={3}>{UI_TEXT.addGame}</Heading>
+                  <Heading level={3}>{UI_TEXT.createSession}</Heading>
                   <Flex gap="size-200" wrap>
-                    <Picker
-                      aria-label={UI_TEXT.playerA}
-                      selectedKey={playerA || undefined}
-                      onSelectionChange={(key: Key | null) => setPlayerA(key ? String(key) : null)}
-                      isDisabled={users.length < 2}
-                      width="size-2400"
-                    >
-                      {users.map((u) => (
-                        <Item key={u}>{u}</Item>
-                      ))}
-                    </Picker>
-                    <Picker
-                      aria-label={UI_TEXT.playerB}
-                      selectedKey={playerB || undefined}
-                      onSelectionChange={(key: Key | null) => setPlayerB(key ? String(key) : null)}
-                      isDisabled={users.length < 2}
-                      width="size-2400"
-                    >
-                      {users.map((u) => (
-                        <Item key={u}>{u}</Item>
-                      ))}
-                    </Picker>
-                    <NumberField
-                      label={UI_TEXT.lines}
-                      minValue={1}
-                      value={lines}
-                      onChange={setLines}
-                      formatOptions={{ maximumFractionDigits: 0 }}
-                      width="size-2000"
-                    />
-
-                    <DialogTrigger type="modal">
-                      <Button
-                        variant="cta"
-                        isDisabled={!playerA || !playerB || playerA === playerB || lines < 1}
-                      >
-                        {UI_TEXT.recordWinner}
-                      </Button>
-                      <Dialog>
-                        <Heading>{UI_TEXT.confirmWinner}</Heading>
-                        <Content>
-                          <Text>{UI_TEXT.selectWinner}</Text>
-                          <Flex gap="size-200" marginTop="size-200">
-                            <ActionButton
-                              onPress={() => {
-                                if (!playerA || !playerB) return
-                                setGames((prev) => [
-                                  { id: crypto.randomUUID(), a: playerA, b: playerB, lines, winner: playerA },
-                                  ...prev,
-                                ])
-                              }}
-                            >
-                              {playerA || UI_TEXT.playerA}
-                            </ActionButton>
-                            <ActionButton
-                              onPress={() => {
-                                if (!playerA || !playerB) return
-                                setGames((prev) => [
-                                  { id: crypto.randomUUID(), a: playerA, b: playerB, lines, winner: playerB },
-                                  ...prev,
-                                ])
-                              }}
-                            >
-                              {playerB || UI_TEXT.playerB}
-                            </ActionButton>
-                          </Flex>
-                        </Content>
-                        <ButtonGroup>
-                          <Button variant="secondary">{UI_TEXT.close}</Button>
-                        </ButtonGroup>
-                      </Dialog>
-                    </DialogTrigger>
+                    <Text>{UI_TEXT.selectPlayers}</Text>
+                    {/* Future: Picker for playerA and playerB and a DatePicker */}
+                    <Button variant="primary" isDisabled>
+                      {UI_TEXT.create}
+                    </Button>
                   </Flex>
+                </View>
 
-                  <View marginTop="size-300">
-                    <TableView aria-label={UI_TEXT.games} density="spacious">
-                      <TableHeader>
-                        <Column>{UI_TEXT.playerA}</Column>
-                        <Column>{UI_TEXT.playerB}</Column>
-                        <Column>{UI_TEXT.lines}</Column>
-                        <Column>{UI_TEXT.recordWinner}</Column>
-                      </TableHeader>
-                      <TableBody>
-                        {games.map((g) => (
-                          <Row key={g.id}>
-                            <Cell>{g.a}</Cell>
-                            <Cell>{g.b}</Cell>
-                            <Cell>{g.lines}</Cell>
-                            <Cell>{g.winner}</Cell>
-                          </Row>
-                        ))}
-                      </TableBody>
-                    </TableView>
-                  </View>
+                <Divider size="S" />
+
+                <View>
+                  <Heading level={3}>{UI_TEXT.sessionsList}</Heading>
+                  {sessions.length === 0 ? (
+                    <Text>No sessions yet.</Text>
+                  ) : (
+                    <ListView aria-label={UI_TEXT.sessionsList} selectionMode="none">
+                      {sessions.map((s) => (
+                        <Item key={s.id}>
+                          {s.dateISO} — {s.playerA} vs {s.playerB} ({s.matches.length} matches)
+                        </Item>
+                      ))}
+                    </ListView>
+                  )}
                 </View>
               </>
             )}
