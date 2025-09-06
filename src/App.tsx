@@ -14,6 +14,8 @@ import {
   Divider,
   ActionGroup,
   ToggleButton,
+  Picker,
+  DatePicker,
   TableView,
   TableHeader,
   Column,
@@ -23,6 +25,7 @@ import {
 } from '@adobe/react-spectrum'
 import { STORAGE_KEYS, UI_TEXT } from './constants'
 import type { UserName, Game, Session, Match, GameResult } from './types'
+import { today, getLocalTimeZone } from '@internationalized/date'
 
 function App() {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
@@ -59,6 +62,20 @@ function App() {
       return []
     }
   })
+  const [sessionPlayerA, setSessionPlayerA] = useState<UserName | null>(null)
+  const [sessionPlayerB, setSessionPlayerB] = useState<UserName | null>(null)
+  const [sessionDate, setSessionDate] = useState<string | null>(() => today(getLocalTimeZone()).toString())
+  // Ensure both pickers never hold the same player
+  useEffect(() => {
+    if (sessionPlayerA && sessionPlayerB === sessionPlayerA) {
+      setSessionPlayerB(null)
+    }
+  }, [sessionPlayerA])
+  useEffect(() => {
+    if (sessionPlayerB && sessionPlayerA === sessionPlayerB) {
+      setSessionPlayerA(null)
+    }
+  }, [sessionPlayerB])
   const ranking = useMemo(() => {
     const totals = new Map<string, number>()
     for (const u of users) totals.set(u, 0)
@@ -88,6 +105,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.scheme, colorScheme)
   }, [colorScheme])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(sessions))
+  }, [sessions])
 
   return (
     <Provider theme={defaultTheme} colorScheme={colorScheme}>
@@ -180,10 +201,56 @@ function App() {
               <>
                 <View>
                   <Heading level={3}>{UI_TEXT.createSession}</Heading>
-                  <Flex gap="size-200" wrap>
-                    <Text>{UI_TEXT.selectPlayers}</Text>
-                    {/* Future: Picker for playerA and playerB and a DatePicker */}
-                    <Button variant="primary" isDisabled>
+                  <Flex gap="size-200" wrap alignItems="end">
+                    <Picker
+                      label={UI_TEXT.playerA}
+                      selectedKey={sessionPlayerA || undefined}
+                      onSelectionChange={(key) => setSessionPlayerA(key ? String(key) : null)}
+                      isDisabled={users.length < 1}
+                      width="size-2400"
+                    >
+                      {users
+                        .filter((u) => u !== sessionPlayerB)
+                        .map((u) => (
+                        <Item key={u}>{u}</Item>
+                        ))}
+                    </Picker>
+                    <Picker
+                      label={UI_TEXT.playerB}
+                      selectedKey={sessionPlayerB || undefined}
+                      onSelectionChange={(key) => setSessionPlayerB(key ? String(key) : null)}
+                      isDisabled={users.length < 2}
+                      width="size-2400"
+                    >
+                      {users
+                        .filter((u) => u !== sessionPlayerA)
+                        .map((u) => (
+                        <Item key={u}>{u}</Item>
+                        ))}
+                    </Picker>
+                    <DatePicker
+                      label={UI_TEXT.sessionDate}
+                      defaultValue={today(getLocalTimeZone())}
+                      onChange={(v: any) => setSessionDate(v ? String(v) : null)}
+                    />
+                    <Button
+                      variant="cta"
+                      isDisabled={!sessionPlayerA || !sessionPlayerB || sessionPlayerA === sessionPlayerB || !sessionDate}
+                      onPress={() => {
+                        if (!sessionPlayerA || !sessionPlayerB || !sessionDate) return
+                        const newSession: Session = {
+                          id: crypto.randomUUID(),
+                          dateISO: sessionDate!,
+                          playerA: sessionPlayerA,
+                          playerB: sessionPlayerB,
+                          matches: [],
+                        }
+                        setSessions((prev) => [newSession, ...prev])
+                        setSessionPlayerA(null)
+                        setSessionPlayerB(null)
+                        setSessionDate(today(getLocalTimeZone()).toString())
+                      }}
+                    >
                       {UI_TEXT.create}
                     </Button>
                   </Flex>
