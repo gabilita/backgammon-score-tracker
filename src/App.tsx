@@ -28,7 +28,7 @@ import {
 } from '@adobe/react-spectrum'
 import { STORAGE_KEYS, UI_TEXT } from './constants'
 import logoUrl from '/backgammon.svg'
-import type { UserName, Game, Session, Match, GameResult } from './types'
+import type { UserName, Game, Session } from './types'
 import { today, getLocalTimeZone } from '@internationalized/date'
 
 function App() {
