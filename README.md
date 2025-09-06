@@ -1,69 +1,52 @@
-# React + TypeScript + Vite
+# Backgammon Score Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Adobe React Spectrum app to manage players, sessions, and rankings.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node 20+ required (Vite v5)
+- Install deps: `npm install`
+- Run dev: `nvm use 20 && npm run dev`
 
-## Expanding the ESLint configuration
+## Build
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Outputs to `dist/`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Deployment (GitHub Pages)
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+This repo is configured to auto-deploy to GitHub Pages via GitHub Actions.
+
+- Site URL: `https://gabilita.github.io/backgammon-score-tracker/`
+- Vite base path: set in `vite.config.ts` as `base: '/backgammon-score-tracker/'`
+
+### One-time setup
+
+1) Settings → Pages → Build and deployment → Source: “GitHub Actions”
+2) Ensure Actions are enabled: Settings → Actions → General → allow all actions
+
+### How it works
+
+- On push to `main`, the workflow `.github/workflows/deploy.yml`:
+  - installs deps
+  - runs `npm run build`
+  - uploads `dist/` and deploys to Pages
+
+### Trigger a deploy manually
+
+- Go to Actions → “Deploy to GitHub Pages” → Run workflow (workflow_dispatch enabled)
+
+### Common 404s on Pages
+
+- Raw source like `/src/main.tsx` will 404. Pages serves the built bundle under `/backgammon-score-tracker/`.
+- Use Vite asset imports or relative paths; favicon is `backgammon.svg` in `public/`.
+- Header logo imported as `import logoUrl from '/backgammon.svg'` to respect base.
+
+### Check deployment status
+
+- Actions tab: “Deploy to GitHub Pages” run status and logs
+- Environments: “github-pages” shows latest deployment and URL
+- Settings → Pages shows overall configuration
