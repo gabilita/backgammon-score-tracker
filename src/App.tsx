@@ -115,7 +115,8 @@ function App() {
       <Flex direction="column" gap="size-0" minHeight="100vh">
         <View position="sticky" top={0} zIndex={1} backgroundColor="gray-50" borderBottomWidth="thin" borderColor="gray-300" paddingX="size-400" paddingY="size-200">
           <Flex direction="row" justifyContent="space-between" alignItems="center">
-            <a onClick={() => setActiveView('home')} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}>
+            <a onClick={() => setActiveView('home')} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <img src="/backgammon.svg" alt="Backgammon" width={28} height={28} />
               <Heading level={1}>{UI_TEXT.appTitle}</Heading>
             </a>
             <Flex direction="row" gap="size-300" alignItems="center">
