@@ -119,7 +119,7 @@ function App() {
         <View position="sticky" top={0} zIndex={1} backgroundColor="gray-50" borderBottomWidth="thin" borderColor="gray-300" paddingX="size-400" paddingY="size-200" UNSAFE_className="app-header">
           <Flex direction="row" justifyContent="space-between" alignItems="center" wrap>
             <a onClick={() => setActiveView('home')} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <img src="/backgammon.svg" alt="Backgammon" width={28} height={28} />
+              <img src={new URL('../public/backgammon.svg', import.meta.url).href} alt="Backgammon" width={28} height={28} />
               <Heading level={1} UNSAFE_className="app-title">{UI_TEXT.appTitle}</Heading>
             </a>
             <Flex direction="row" gap="size-300" alignItems="center">
