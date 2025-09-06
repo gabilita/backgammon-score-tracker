@@ -27,23 +27,18 @@ import {
   Cell,
 } from '@adobe/react-spectrum'
 import { STORAGE_KEYS, UI_TEXT } from './constants'
+import type { UserName, Game } from './types'
 
 function App() {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
     () => (localStorage.getItem(STORAGE_KEYS.scheme) as 'light' | 'dark') || 'light',
   )
   const [userName, setUserName] = useState('')
-  const [users, setUsers] = useState<string[]>([])
-  const [playerA, setPlayerA] = useState<string | null>(null)
-  const [playerB, setPlayerB] = useState<string | null>(null)
+  const [users, setUsers] = useState<UserName[]>([])
+  const [playerA, setPlayerA] = useState<UserName | null>(null)
+  const [playerB, setPlayerB] = useState<UserName | null>(null)
   const [lines, setLines] = useState<number>(1)
-  const [games, setGames] = useState<{
-    id: string
-    a: string
-    b: string
-    lines: number
-    winner: string
-  }[]>([])
+  const [games, setGames] = useState<Game[]>([])
   const ranking = useMemo(() => {
     const totals = new Map<string, number>()
     for (const u of users) totals.set(u, 0)
@@ -55,14 +50,8 @@ function App() {
 
   useEffect(() => {
     try {
-      const savedUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]') as string[]
-      const savedGames = JSON.parse(localStorage.getItem(STORAGE_KEYS.games) || '[]') as {
-        id: string
-        a: string
-        b: string
-        lines: number
-        winner: string
-      }[]
+      const savedUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]') as UserName[]
+      const savedGames = JSON.parse(localStorage.getItem(STORAGE_KEYS.games) || '[]') as Game[]
       if (Array.isArray(savedUsers)) setUsers(savedUsers)
       if (Array.isArray(savedGames)) setGames(savedGames)
     } catch {}
