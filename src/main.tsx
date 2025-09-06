@@ -6,7 +6,7 @@ import { Provider, defaultTheme } from '@adobe/react-spectrum'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider theme={defaultTheme} colorScheme="light">
+    <Provider theme={defaultTheme}>
       <App />
     </Provider>
   </StrictMode>,
