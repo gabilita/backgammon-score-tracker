@@ -27,6 +27,7 @@ import {
   Cell,
 } from '@adobe/react-spectrum'
 import { STORAGE_KEYS, UI_TEXT } from './constants'
+import logoUrl from '/backgammon.svg'
 import type { UserName, Game, Session, Match, GameResult } from './types'
 import { today, getLocalTimeZone } from '@internationalized/date'
 
@@ -119,7 +120,7 @@ function App() {
         <View position="sticky" top={0} zIndex={1} backgroundColor="gray-50" borderBottomWidth="thin" borderColor="gray-300" paddingX="size-400" paddingY="size-200" UNSAFE_className="app-header">
           <Flex direction="row" justifyContent="space-between" alignItems="center" wrap>
             <a onClick={() => setActiveView('home')} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <img src={new URL('../public/backgammon.svg', import.meta.url).href} alt="Backgammon" width={28} height={28} />
+              <img src={logoUrl} alt="Backgammon" width={28} height={28} />
               <Heading level={1} UNSAFE_className="app-title">{UI_TEXT.appTitle}</Heading>
             </a>
             <Flex direction="row" gap="size-300" alignItems="center">
