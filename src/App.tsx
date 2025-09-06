@@ -58,7 +58,7 @@ function App() {
       return []
     }
   })
-  const [activeView, setActiveView] = useState<'home' | 'players' | 'sessions' | 'rankings'>('home')
+  const [activeView, setActiveView] = useState<'home' | 'players' | 'sessions' | 'rankings' | 'rules'>('home')
   const [sessions, setSessions] = useState<Session[]>(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEYS.sessions) || '[]') as Session[]
@@ -135,6 +135,7 @@ function App() {
                   <Item key="players">Players</Item>
                   <Item key="sessions">{UI_TEXT.sessions}</Item>
                   <Item key="rankings">Rankings</Item>
+                  <Item key="rules">{UI_TEXT.rules}</Item>
                 </ActionGroup>
               </div>
               <div className="mobile-only">
@@ -171,6 +172,7 @@ function App() {
                     <Item key="players">{UI_TEXT.users}</Item>
                     <Item key="sessions">{UI_TEXT.sessions}</Item>
                     <Item key="rankings">{UI_TEXT.ranking}</Item>
+                    <Item key="rules">{UI_TEXT.rules}</Item>
                   </ActionGroup>
                 </View>
               </View>
@@ -312,6 +314,27 @@ function App() {
                     ))}
                   </TableBody>
                 </TableView>
+              </View>
+            )}
+
+            {activeView === 'rules' && (
+              <View>
+                <Heading level={3}>{UI_TEXT.rules}</Heading>
+                <Text>
+                  Backgammon is a two‑player game where each player races 15 checkers around the board to bear them off first.
+                </Text>
+                <ul>
+                  <li>Setup: 24‑point board, each player with 15 checkers.</li>
+                  <li>Movement: Move according to two dice; moves must be to open points.</li>
+                  <li>Hitting: Landing on a single opposing checker sends it to the bar.</li>
+                  <li>Entering from bar: Must re‑enter before making other moves.</li>
+                  <li>Bearing off: When all checkers are in home board, bear off by exact dice.</li>
+                  <li>Scoring: Single game; gammon (opponent bears off none) counts double; backgammon (opponent has checkers in your home or on bar) counts triple.</li>
+                </ul>
+                <Text>
+                  For a complete rulebook, see&nbsp;
+                  <a href="https://www.bkgm.com/rules.html" target="_blank" rel="noreferrer">Backgammon Official Rules</a>.
+                </Text>
               </View>
             )}
           </Flex>

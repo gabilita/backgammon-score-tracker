@@ -41,6 +41,7 @@ export const UI_TEXT = {
   addMatch: 'Add Match',
   addGameWin: 'Add Game Win',
   bestOfThree: 'Best of 3',
+  rules: 'Rules',
 } as const
 
 export type ColorScheme = 'light' | 'dark'
