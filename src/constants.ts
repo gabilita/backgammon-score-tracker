@@ -2,6 +2,9 @@ export const STORAGE_KEYS = {
   users: 'bst:users',
   games: 'bst:games',
   scheme: 'bst:scheme',
+  players: 'bst:players',
+  matches: 'bst:matches',
+  rankingTotals: 'bst:ranking',
 } as const
 
 export const UI_TEXT = {

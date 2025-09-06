@@ -36,11 +36,31 @@ function App() {
     () => (localStorage.getItem(STORAGE_KEYS.scheme) as 'light' | 'dark') || 'light',
   )
   const [userName, setUserName] = useState('')
-  const [users, setUsers] = useState<UserName[]>([])
+  const [users, setUsers] = useState<UserName[]>(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem(STORAGE_KEYS.players) ||
+          localStorage.getItem(STORAGE_KEYS.users) ||
+          '[]',
+      ) as UserName[]
+    } catch {
+      return []
+    }
+  })
   const [playerA, setPlayerA] = useState<UserName | null>(null)
   const [playerB, setPlayerB] = useState<UserName | null>(null)
   const [lines, setLines] = useState<number>(1)
-  const [games, setGames] = useState<Game[]>([])
+  const [games, setGames] = useState<Game[]>(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem(STORAGE_KEYS.matches) ||
+          localStorage.getItem(STORAGE_KEYS.games) ||
+          '[]',
+      ) as Game[]
+    } catch {
+      return []
+    }
+  })
   const [activeView, setActiveView] = useState<'home' | 'players' | 'matches' | 'rankings'>('home')
   const ranking = useMemo(() => {
     const totals = new Map<string, number>()
@@ -51,19 +71,25 @@ function App() {
     return [...totals.entries()].sort((a, b) => b[1] - a[1])
   }, [users, games])
 
-  useEffect(() => {
-    try {
-      const savedUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '[]') as UserName[]
-      const savedGames = JSON.parse(localStorage.getItem(STORAGE_KEYS.games) || '[]') as Game[]
-      if (Array.isArray(savedUsers)) setUsers(savedUsers)
-      if (Array.isArray(savedGames)) setGames(savedGames)
-    } catch {}
-  }, [])
+  // initial state is loaded synchronously from localStorage in useState initializers above
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users))
-    localStorage.setItem(STORAGE_KEYS.games, JSON.stringify(games))
+    // Save under new keys (players/matches) and legacy keys (users/games)
+    const usersJson = JSON.stringify(users)
+    const gamesJson = JSON.stringify(games)
+    localStorage.setItem(STORAGE_KEYS.players, usersJson)
+    localStorage.setItem(STORAGE_KEYS.users, usersJson)
+    localStorage.setItem(STORAGE_KEYS.matches, gamesJson)
+    localStorage.setItem(STORAGE_KEYS.games, gamesJson)
   }, [users, games])
+
+  // Persist computed rankings snapshot for convenience
+  useEffect(() => {
+    try {
+      const totalsObject = Object.fromEntries(ranking)
+      localStorage.setItem(STORAGE_KEYS.rankingTotals, JSON.stringify(totalsObject))
+    } catch {}
+  }, [ranking])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.scheme, colorScheme)
