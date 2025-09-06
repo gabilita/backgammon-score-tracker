@@ -8,3 +8,16 @@
   .mobile-only { display: none; }
   .desktop-only { display: block; }
 }
+
+/* Header/title responsiveness */
+.app-header { overflow: hidden; }
+.app-title { font-size: 1.25rem; }
+@media (min-width: 768px) {
+  .app-title { font-size: 1.5rem; }
+}
+
+/* Content padding on small screens */
+.app-content { padding: 0.75rem !important; }
+@media (min-width: 768px) {
+  .app-content { padding: 1.5rem !important; }
+}

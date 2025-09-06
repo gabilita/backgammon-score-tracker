@@ -13,6 +13,9 @@ import {
   Item,
   Divider,
   ActionGroup,
+  ActionButton,
+  DialogTrigger,
+  Menu,
   ToggleButton,
   Picker,
   DatePicker,
@@ -113,23 +116,36 @@ function App() {
   return (
     <Provider theme={defaultTheme} colorScheme={colorScheme}>
       <Flex direction="column" gap="size-0" minHeight="100vh">
-        <View position="sticky" top={0} zIndex={1} backgroundColor="gray-50" borderBottomWidth="thin" borderColor="gray-300" paddingX="size-400" paddingY="size-200">
-          <Flex direction="row" justifyContent="space-between" alignItems="center">
+        <View position="sticky" top={0} zIndex={1} backgroundColor="gray-50" borderBottomWidth="thin" borderColor="gray-300" paddingX="size-400" paddingY="size-200" UNSAFE_className="app-header">
+          <Flex direction="row" justifyContent="space-between" alignItems="center" wrap>
             <a onClick={() => setActiveView('home')} style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <img src="/backgammon.svg" alt="Backgammon" width={28} height={28} />
-              <Heading level={1}>{UI_TEXT.appTitle}</Heading>
+              <Heading level={1} UNSAFE_className="app-title">{UI_TEXT.appTitle}</Heading>
             </a>
             <Flex direction="row" gap="size-300" alignItems="center">
-              <ActionGroup
-                selectionMode="single"
-                selectedKeys={[activeView === 'home' ? 'players' : activeView]}
-                onSelectionChange={(keys) => setActiveView(Array.from(keys)[0] as 'players' | 'sessions' | 'rankings')}
-                isQuiet
-              >
-                <Item key="players">Players</Item>
-                <Item key="sessions">{UI_TEXT.sessions}</Item>
-                <Item key="rankings">Rankings</Item>
-              </ActionGroup>
+              <div className="desktop-only">
+                <ActionGroup
+                  selectionMode="single"
+                  selectedKeys={[activeView === 'home' ? 'players' : activeView]}
+                  onSelectionChange={(keys) => setActiveView(Array.from(keys)[0] as 'players' | 'sessions' | 'rankings')}
+                  isQuiet
+                  overflowMode="wrap"
+                >
+                  <Item key="players">Players</Item>
+                  <Item key="sessions">{UI_TEXT.sessions}</Item>
+                  <Item key="rankings">Rankings</Item>
+                </ActionGroup>
+              </div>
+              <div className="mobile-only">
+                <DialogTrigger type="tray">
+                  <ActionButton aria-label="Menu">☰</ActionButton>
+                  <Menu onAction={(key) => setActiveView(key as 'players' | 'sessions' | 'rankings')}>
+                    <Item key="players">Players</Item>
+                    <Item key="sessions">{UI_TEXT.sessions}</Item>
+                    <Item key="rankings">Rankings</Item>
+                  </Menu>
+                </DialogTrigger>
+              </div>
               <ToggleButton
                 isSelected={colorScheme === 'dark'}
                 onChange={(isSelected) => setColorScheme(isSelected ? 'dark' : 'light')}
@@ -140,8 +156,8 @@ function App() {
           </Flex>
         </View>
 
-        <View flex={1} overflow="auto" padding="size-400">
-          <Flex direction="column" gap="size-300">
+        <View flex={1} overflow="auto" padding="size-400" UNSAFE_className="app-content">
+          <Flex direction="column" gap="size-300" UNSAFE_className="content-stack">
             {activeView === 'home' && (
               <View>
                 <Heading level={2}>{UI_TEXT.welcome}</Heading>
