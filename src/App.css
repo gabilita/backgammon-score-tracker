@@ -1,1 +1,10 @@
 /* Remove Vite starter styles so Spectrum can style components */
+
+/* Responsive visibility helpers */
+.mobile-only { display: block; }
+.desktop-only { display: none; }
+
+@media (min-width: 768px) {
+  .mobile-only { display: none; }
+  .desktop-only { display: block; }
+}

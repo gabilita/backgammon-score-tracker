@@ -6,12 +6,13 @@ export const STORAGE_KEYS = {
 
 export const UI_TEXT = {
   appTitle: 'Backgammon Score Tracker',
-  addUser: 'Add User',
+  welcome: 'Welcome to Backgammon Score Tracker',
+  addUser: 'Add Player',
   nameLabel: 'Name',
   add: 'Add',
-  noUsers: 'No users yet.',
-  users: 'Users',
-  addGame: 'Add Game / Lines',
+  noUsers: 'No players yet.',
+  users: 'Players',
+  addGame: 'Add Match / Lines',
   playerA: 'Player A',
   playerB: 'Player B',
   lines: 'Lines',
@@ -19,13 +20,14 @@ export const UI_TEXT = {
   confirmWinner: 'Confirm Winner',
   selectWinner: 'Select the winner for this game.',
   close: 'Close',
-  games: 'Games',
-  ranking: 'Ranking',
+  games: 'Matches',
+  ranking: 'Rankings',
   rank: 'Rank',
   player: 'Player',
   totalLines: 'Total Lines',
   toggleToDark: 'Switch to Dark',
   toggleToLight: 'Switch to Light',
+  darkMode: 'Dark mode',
 } as const
 
 export type ColorScheme = 'light' | 'dark'
